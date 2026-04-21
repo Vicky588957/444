@@ -11,10 +11,12 @@
   box-sizing: border-box;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
 }
+body {
+  background: #f0f2f5;
+  padding: 20px;
+}
 
-
-
-/* 弹窗 */
+/* 弹窗 - 调整为直接显示在页面中 */
 .modal {
   width: 90%;
   max-width: 1100px;
@@ -25,9 +27,10 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  margin: 0 auto;
 }
 
-/* 头部 */
+/* 头部 - 移除关闭按钮相关样式保留标题 */
 .modal-header {
   padding: 18px 24px;
   border-bottom: 1px solid #f0f0f0;
@@ -38,23 +41,6 @@
 .modal-header h3 {
   font-size: 17px;
   font-weight: 600;
-  color: #1f2329;
-}
-.btn-close {
-  background: none;
-  border: none;
-  font-size: 20px;
-  color: #86909c;
-  cursor: pointer;
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.btn-close:hover {
-  background: #f2f3f5;
   color: #1f2329;
 }
 
@@ -76,6 +62,12 @@
   border-radius: 10px;
   padding: 20px;
   background: #fafafa;
+  transition: all 0.2s;
+}
+.nonconform-item:hover {
+  border-color: #d0d8e6;
+  background: #fff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
 }
 .item-header {
   display: flex;
@@ -109,6 +101,7 @@
   padding: 5px 12px;
   font-size: 13px;
   cursor: pointer;
+  transition: all 0.2s;
 }
 .btn-delete-item:hover {
   background: #f53f3f;
@@ -159,6 +152,7 @@ select {
   border: 1px solid #dcdfe6;
   border-radius: 8px;
   font-size: 14px;
+  transition: border-color 0.2s;
   outline: none;
 }
 input:focus,
@@ -203,6 +197,7 @@ textarea {
   border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
+  transition: all 0.2s;
   width: 180px;
 }
 .btn-add:hover {
@@ -236,6 +231,7 @@ textarea {
   cursor: pointer;
   font-size: 14px;
   color: #4e5969;
+  transition: all 0.2s;
 }
 .btn-cancel:hover {
   background: #f2f3f5;
@@ -248,19 +244,21 @@ textarea {
   border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
+  box-shadow: 0 2px 6px rgba(22, 119, 255, 0.2);
+  transition: all 0.2s;
 }
 .btn-submit:hover {
   background: #4096ff;
 }
 </style>
 </head>
-<body>
 
-<div class="modal-overlay" id="modalOverlay">
+<body>
+  <!-- 只保留弹窗本体 -->
   <div class="modal">
     <div class="modal-header">
       <h3>添加不符合项</h3>
-      <button class="btn-close" id="closeModalBtn">&times;</button>
+      <!-- 移除关闭按钮 -->
     </div>
     <div class="modal-body">
       <div class="nonconform-list" id="nonconformList">
@@ -281,10 +279,10 @@ textarea {
             <div class="form-group">
               <label>分类 <span>*</span></label>
               <div class="checkbox-group">
-                <label><input type="radio" name="category[0]" value="资源性不符合" />资源性不符合</label>
-                <label><input type="radio" name="category[0]" value="体系性不符合" />体系性不符合</label>
-                <label><input type="radio" name="category[0]" value="实施性不符合" />实施性不符合</label>
-                <label><input type="radio" name="category[0]" value="效果性不符合" />效果性不符合</label>
+                <label><input type="radio" name="category[0]" value="资源性不符合" />资源性</label>
+                <label><input type="radio" name="category[0]" value="体系性不符合" />体系性</label>
+                <label><input type="radio" name="category[0]" value="实施性不符合" />实施性</label>
+                <label><input type="radio" name="category[0]" value="效果性不符合" />效果性</label>
               </div>
             </div>
 
@@ -310,12 +308,12 @@ textarea {
       <!-- 独立改进建议输入框 仅数字 -->
       <div class="suggestion-group">
         <div class="form-group">
-          <label>改进建议数量</label>
+          <label>改进建议分值</label>
           <input 
             type="number" 
             id="improveSuggestion" 
             class="suggestion-input" 
-            placeholder="请输入" 
+            placeholder="请输入数字" 
             oninput="value=value.replace(/[^\d]/g,'')"
           />
         </div>
@@ -327,30 +325,40 @@ textarea {
       <button class="btn-submit" id="submitBtn">确认提交</button>
     </div>
   </div>
-</div>
 
 <script>
-const modalOverlay = document.getElementById('modalOverlay')
-const closeModalBtn = document.getElementById('closeModalBtn')
-const cancelBtn = document.getElementById('cancelBtn')
 const nonconformList = document.getElementById('nonconformList')
 const addItemBtn = document.getElementById('addItemBtn')
 const submitBtn = document.getElementById('submitBtn')
+const cancelBtn = document.getElementById('cancelBtn')
 const improveSuggestion = document.getElementById('improveSuggestion')
 
 const templateItem = nonconformList.querySelector('.nonconform-item')
 let itemIndex = 1
 
-// 关闭弹窗
-function closeModal() {
-  modalOverlay.style.display = 'none'
-}
-
-// 关闭事件绑定
-closeModalBtn.addEventListener('click', closeModal)
-cancelBtn.addEventListener('click', closeModal)
-modalOverlay.addEventListener('click', (e) => {
-  if (e.target === modalOverlay) closeModal()
+// 取消按钮仅清空表单（无遮罩层，无需关闭弹窗）
+cancelBtn.addEventListener('click', () => {
+  if (confirm('确定要清空所有填写的内容吗？')) {
+    // 保留第一条空表单，删除其他项
+    while (nonconformList.children.length > 1) {
+      nonconformList.removeChild(nonconformList.lastChild)
+    }
+    // 清空第一条表单内容
+    const firstItem = nonconformList.querySelector('.nonconform-item')
+    const inputs = firstItem.querySelectorAll('input, textarea')
+    inputs.forEach(input => {
+      if (input.type === 'radio') {
+        input.checked = input.name.includes('degree') && input.value === '一般不符合'
+      } else {
+        input.value = ''
+      }
+    })
+    // 清空改进建议分值
+    improveSuggestion.value = ''
+    // 重置索引
+    itemIndex = 1
+    reorderItems()
+  }
 })
 
 // 绑定收起展开事件
@@ -438,6 +446,7 @@ submitBtn.addEventListener('click', () => {
     const category = item.querySelector(`input[name="category[${i}]"]:checked`)?.value
     const desc = item.querySelector(`textarea[name="description[${i}]"]`).value.trim()
     const clause = item.querySelector(`textarea[name="clause[${i}]"]`).value.trim()
+    const file = item.querySelector(`input[name="fileInfo[${i}]"]`).value.trim()
 
     if (!degree) {
       alert(`第 ${i+1} 项：请选择不符合程度`)
@@ -464,7 +473,7 @@ submitBtn.addEventListener('click', () => {
       index: i + 1,
       degree,
       category,
-      fileInfo: item.querySelector(`input[name="fileInfo[${i}]"]`).value.trim(),
+      fileInfo: file,
       description: desc,
       clause
     })
@@ -480,7 +489,9 @@ submitBtn.addEventListener('click', () => {
 
   console.log('最终提交数据：', submitData)
   alert('提交成功！数据已打印到控制台')
-  closeModal()
+  
+  // 提交后清空表单
+  cancelBtn.click()
 })
 </script>
 </body>
